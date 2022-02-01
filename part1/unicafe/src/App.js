@@ -1,17 +1,20 @@
 import React, { useState } from 'react'
 
-const Button = (props) => {
+const Button = ({onClick,text}) => {
   return (
-    <button onClick={props.onClick}>{props.text}</button>
+    <button onClick={onClick}>{text}</button>
   )
 }
-const Statics = (props) => {
+const Statics = ({good,neutral,bad}) => {
   return (
     <div>
       <h1>statics</h1>
-      <p>good {props.good}</p>
-      <p>neutral {props.neutral}</p>
-      <p>bad {props.bad}</p>
+      <p>good {good}</p>
+      <p>neutral {neutral}</p>
+      <p>bad {bad}</p>
+      <p>all {good+neutral+bad}</p>
+      <p>average {(good*1+neutral*0+bad*(-1))/(good+neutral+bad)}</p>
+      <p>positive {good*100/(good+neutral+bad)}%</p>
     </div>
   )
 }
