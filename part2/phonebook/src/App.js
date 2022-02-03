@@ -1,10 +1,8 @@
 import React, { useState,useEffect } from 'react'
-import axios from 'axios'
 import Filter from './components/Filter'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
-
-
+import personService from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -13,14 +11,15 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterName, setFilterName] = useState('')
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(initalPersons => {
+        setPersons(initalPersons)
+        console.log(initalPersons);
       })
   }, [])
   
-  const handleClick = (event) => {
+  const addPerson = (event) => {
     event.preventDefault()
     const newPerson = {
       name: newName,
@@ -30,16 +29,23 @@ const App = () => {
     if (persons.find(person => person.name === newPerson.name)) {
       alert(`${newPerson.name} is already added to phonebook`)
     }
-    setPersons(persons.concat(newPerson))
+    personService
+      .create(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
+      })
+      .catch(error => {
+        console.log("failed to add person");
+      })
     setNewName('')
     setNewNumber('')
   }
 
-  const handleNameChange = (event) => {
+  const changeName = (event) => {
     setNewName(event.target.value)
   }
 
-  const handleNumberChange = (event) => {
+  const changeNumber = (event) => {
     setNewNumber(event.target.value)
   }
   
@@ -53,7 +59,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter filterName={filterName} onChange={handleFilterNameChange}/>
       <h3>Add a new</h3>
-      <PersonForm addPerson={handleClick} newName={newName} newNumber={newNumber} setNewName={handleNameChange} setNewNumber={handleNumberChange}  />
+      <PersonForm addPerson={addPerson} newName={newName} newNumber={newNumber} setNewName={changeName} setNewNumber={changeNumber}  />
       <h2>Numbers</h2>
       {filterName === ''?
       <Persons persons={persons}/>
