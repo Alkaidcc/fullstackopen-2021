@@ -1,6 +1,6 @@
 import personService from '../services/persons'
 import { useState, useEffect } from 'react'
-const Persons = ({persons,setPersons,filterName}) => {
+const Persons = ({persons,setPersons,filterName,setMessage}) => {
   
   const [filterPersons, setFilterPersons] = useState(persons)
   // When persons and filterName change, filterPersons is updated
@@ -16,6 +16,23 @@ const Persons = ({persons,setPersons,filterName}) => {
           .then(response => {
             setFilterPersons(persons.filter(item => item !== person))
             setPersons(persons.filter(item => item !== person))
+            setMessage({
+              text: `Deleted ${person.name}`,
+              type: "success"
+            })
+            setTimeout(() => {
+              setMessage(null)
+            }, 3000)
+      })
+      .catch(error => {
+        setFilterPersons(filterPersons.filter(item => item !== person))
+          setMessage({
+            text: `Information of ${person.name} has already been removed from server`,
+            type: "error"
+          })
+          setTimeout(() => {
+            setMessage(null)
+          }, 3000)
       })
     }
   }
