@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator')
 
 const url = process.env.MONGODB_URI;
 
@@ -13,8 +14,21 @@ mongoose.connect(url)
     })
 
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: {
+        type: String,
+        unique: true,
+        minlength: [3, 'Name must have atleast 3 characters'],
+        required: true
+    },
+    number: {
+        type: String,
+        unique: true,
+        minlength: [8, 'Name must have atleast 8 characters'],
+        validate: {
+            validator: v => /(^\d{2}-.\d{5,})|(^\d{3}-.\d{4,})|(\d{8,})/.test(v),
+            message: props => `${props.value} is not a valid phone number`
+        }
+    }
 })
 
 personSchema.set('toJSON', {
@@ -24,5 +38,5 @@ personSchema.set('toJSON', {
         delete returnedObject.__v
     }
 })
-
+personSchema.plugin(uniqueValidator)
 module.exports = mongoose.model('Person',personSchema)
