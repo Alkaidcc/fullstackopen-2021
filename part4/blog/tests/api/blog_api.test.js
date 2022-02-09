@@ -67,7 +67,6 @@ test('a valid blog can be added ', async () => {
 test('blogs return id instead of _id, _id undefined', async () => {
   const response = await api
     .get('/api/blogs')
-
   expect(response.body[0].id).toBeDefined()
   expect(response.body[0]._id).toBeUndefined()
 })
