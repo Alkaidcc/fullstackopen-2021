@@ -1,54 +1,55 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
-blogsRouter.get('/', (req, res) => {
-  Blog.find({})
-    .then(blogs => {
-      res.json(blogs)
-    })
+blogsRouter.get('/', async (req, res) => {
+  const blogs = await Blog.find({})
+  res.json(blogs)
 })
 
-blogsRouter.get('/:id', (req, res, next) => {
-  Blog.findById(req.params.id)
-    .then(blog => {
-      if (blog) {
-        res.json(blog)
-      } else {
-        res.status(404).send({ error: 'blog not found' })
-      }
-    })
-    .catch(error => next(error))
+blogsRouter.get('/:id', async (req, res) => {
+
+  const blog = await Blog.findById(req.params.id)
+  if (blog) {
+    res.json(blog)
+  } else {
+    res.status(404).end()
+  }
+
 })
 
-blogsRouter.delete('/:id', (req, res, next) => {
-  Blog.findByIdAndRemove(req.params.id)
-    .then(result => {
-      res.status(204).json(result)
-    })
-    .catch(error => next(error))
+blogsRouter.delete('/:id', async (req, res) => {
+  await Blog.findByIdAndRemove(req.params.id)
+  res.status(204).end()
 })
 
-blogsRouter.put('/:id', (req, res, next) => {
+blogsRouter.put('/:id', async (req, res) => {
   const body = req.body
   const blog = {
-    name: body.name,
-    number: body.number
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes
   }
-  Blog.findByIdAndUpdate(req.params.id, blog, { new: true })
-    .then(updatedPerson => {
-      res.json(updatedPerson)
-    })
-    .catch(error => next(error))
+  const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blog, { new: true })
+  res.json(updatedBlog)
+  // Blog.findByIdAndUpdate(req.params.id, blog, { new: true })
+  //   .then(updatedPerson => {
+  //     res.json(updatedPerson)
+  //   })
+  //   .catch(error => next(error))
 })
 
-blogsRouter.post('/',(req,res,next)=>{
+blogsRouter.post('/', async (req, res) => {
+  const body = req.body
 
-  const blog = new Blog(req.body)
-  blog.save()
-    .then(savedBlog => {
-      res.status(201).json(savedBlog)
-    })
-    .catch(error => next(error))
+  const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes
+  })
+  const savedBlog = await blog.save()
+  res.json(savedBlog)
 })
 
 module.exports = blogsRouter
